@@ -8,13 +8,29 @@ function browserSyncScript(dev){
   `;
 }
 
+function each(arr, type){
+  let template;
+
+  switch(type){
+    case 'link':
+      template = '<link rel="stylesheet" type="text/css" href="{PATH}">';
+      break;
+
+    case 'script':
+      template = '<script type="text/javascript" src="{PATH}"></script>';
+      break;
+  }
+
+  return arr.map((filePath) => template.replace('{PATH}', filePath)).join("\n");
+}
+
 module.exports = function(model){
   return `
     <!DOCTYPE html>
     <html lang="en-US">
       <head>
         <title>${ model.head.title }</title>
-        <link rel="stylesheet" type="text/css" href="/css/app.css">
+        ${ each(model.head.styles, 'link') }
         <script>
           window.appData = ${ JSON.stringify(model.appData) };
         </script>
@@ -24,8 +40,7 @@ module.exports = function(model){
           <div id="view" class="view"></div>
         </div>
 
-        <script language="javascript" type="text/javascript" src="/js/app.js"></script>
-        <script type="text/javascript" src="https://ssl.gstatic.com/trends_nrtr/1308_RC02/embed_loader.js"></script>
+        ${ each(model.body.scripts, 'script') }
         ${ browserSyncScript(model.dev) }
       </body>
     </html>
