@@ -1,4 +1,7 @@
-export default ({teams, term}) => {
+import panelNav from './PanelNav';
+import './Term.styl';
+
+export default ({state, teams, term}) => {
   let highPoints = 0;
   let topTeam, btmTeam;
 
@@ -41,10 +44,24 @@ export default ({teams, term}) => {
         ${ teamInfo(btmTeam) }
       </div>
       <div class="term-panel__answers">
-        <input class="is--team1" type="text" name="team1Answer" placeholder="_ TERM or TERM _">
-        <input class="is--team2" type="text" name="team1Answer" placeholder="_ TERM or TERM _">
+        <input
+          class="is--team1"
+          type="text"
+          name="team1Answer"
+          placeholder="_ TERM or TERM _"
+          autofocus
+        >
+        <input
+          class="is--team2"
+          type="text"
+          name="team1Answer"
+          placeholder="_ TERM or TERM _"
+        >
       </div>
-      <div class="term-panel__center-divide">${ term }</div>
+      <div class="term-panel__center-divide">
+        ${ term }
+        ${ panelNav(state.panelNav) }
+      </div>
     </div>
   `;
 };

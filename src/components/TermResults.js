@@ -1,18 +1,21 @@
 import { formatAnswer } from '../utils';
+import panelNav from './PanelNav';
 
-export default ({state}) => {
+export default async ({state}) => {
   const terms = Object.keys(state.teams).map(key =>
     formatAnswer(state.terms[state.termNdx], state.teams[key].answers[state.termNdx])
   ).reverse(); // reverse to keep colors
   const arg2 = {
-    comparisonItem: terms.map(query => {
-      return {keyword:query, geo:'', time:'today 12-m'}
-    }),
+    comparisonItem: terms.map(query => ({
+      keyword: query,
+      geo: '',
+      time: 'today 12-m',
+    })),
     category: 0,
     property: '',
   };
   const arg3 = {
-    exploreQuery: `q=${terms.join(',')}&date=today 12-m,today 12-m`,
+    exploreQuery: `q=${ terms.join(',') }&date=today 12-m,today 12-m`,
     guestPath: 'https://trends.google.com:443/trends/embed/',
   };
   // can't insert script tags, so get hacky
@@ -28,19 +31,18 @@ export default ({state}) => {
   const team1 = state.teams['1'];
   const team2 = state.teams['2'];
 
-  fetch(`${ window.appData.endpoints.get.WIDGET_DATA }/${ terms.join(',') }`)
-  .then(resp => resp.json())
-  .then(resp => {
-    resp.data.value.reverse();
-    team1.points.push(resp.data.value[0]);
-    team2.points.push(resp.data.value[1]);
-    console.log(resp.data.value, team1.points, team2.points);
-  })
+  const widgetData = await fetch(`${ window.appData.endpoints.get.WIDGET_DATA }/${ terms.join(',') }`)
+  .then(resp => resp.json());
+
+  widgetData.data.value.reverse();
+  team1.points[state.termNdx] = widgetData.data.value[0];
+  team2.points[state.termNdx] = widgetData.data.value[1];
 
   return `
     <div class="term-results">
       <div id="trendsPlaceholder"></div>
-      ${widgetCode}
+      ${ widgetCode }
+      ${ panelNav(state.panelNav) }
     </div>
   `;
 };

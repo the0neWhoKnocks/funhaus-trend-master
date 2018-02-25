@@ -1,10 +1,11 @@
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const color = require('cli-color');
 const browserSync = require('browser-sync');
 const opn = require('opn');
 const portscanner = require('portscanner');
-const flags = require('minimist')(process.argv.slice(2));
+const yargs = require('yargs');
 const bodyParser = require('body-parser');
 
 const appConfig = require('./conf.app.js');
@@ -13,17 +14,21 @@ const indexTemplate = require('./public/index.js');
 
 // =============================================================================
 
-for(let key in flags){
-  const val = flags[key];
+yargs
+.option('d', {
+  alias: 'dev',
+  desc: 'Runs the server in Dev mode',
+  type: 'boolean',
+})
+.option('c', {
+  alias: 'cmd',
+  choices: ['init'],
+  desc: 'What function to run on the server (only CLI)',
+})
+.help()
+.argv;
 
-  switch(key){
-    case 'd' :
-    case 'dev' :
-      flags.dev = true;
-      break;
-  }
-};
-
+const flags = yargs.parse();
 
 // =============================================================================
 
@@ -76,13 +81,29 @@ const app = {
         });
       });
 
+      // always get the freshest version of the manifest in dev
+      const manifestPath = path.resolve(__dirname, './public/manifest.json');
+      const manifest = ( flags.dev )
+        ? JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+        : require(manifestPath);
+
       res.send(indexTemplate({
         appData: {
           endpoints: feEndpoints
         },
         appURL: _self.appURL,
+        body: {
+          scripts: [
+            manifest['vendor.js'],
+            manifest['app.js'],
+            'https://ssl.gstatic.com/trends_nrtr/1308_RC02/embed_loader.js',
+          ],
+        },
         dev: flags.dev,
         head: {
+          styles: [
+            manifest['app.css'],
+          ],
           title: appConfig.app.title,
         }
       }));
@@ -116,7 +137,7 @@ const app = {
 
   openBrowser: function(data){
     // let the user know the server is up and ready
-    const  msg = `${color.green.bold.inverse(' SERVER ')} Running at ${color.blue.bold(data.url)}`;
+    let  msg = `${color.green.bold.inverse(' SERVER ')} Running at ${color.blue.bold(data.url)}`;
 
     if( flags.dev ) msg += `\n${color.green.bold.inverse(' WATCHING ')} For changes`;
 
@@ -137,7 +158,7 @@ const app = {
       browserSync.init({
         browser: CHROME,
         files: [ // watch these files
-          appConfig.paths.PUBLIC
+          `${appConfig.paths.PUBLIC}/manifest.json`
         ],
         logLevel: 'silent', // prevent snippet message
         notify: false, // don't show the BS message in the browser
@@ -151,12 +172,7 @@ const app = {
 };
 
 module.exports = app;
-const args = process.argv;
-if(
-  // CLI won't have parent
-  !module.parent
-  // First arg is node executable, second arg is the .js file, the rest are user args
-  && args.length >= 3
-){
-  if( app[args[2]] ) app[args[2]]();
+// CLI won't have parent
+if( !module.parent && flags.cmd ){
+  if( app[flags.cmd] ) app[flags.cmd]();
 }

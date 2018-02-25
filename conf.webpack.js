@@ -1,10 +1,35 @@
+const yargs = require('yargs');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const WebpackAssetsManifest = require('webpack-assets-manifest');
+const TidyPlugin = require('./.webpack/TidyPlugin');
 
+// =============================================================================
+
+yargs
+.option('d', {
+  alias: 'dev',
+  desc: 'Runs in Dev mode',
+  type: 'boolean',
+})
+.argv;
+
+const flags = yargs.parse();
+
+// =============================================================================
+
+const hashLength = 8;
 const conf = {
-  entry: './src/app.js',
+  entry: {
+    'app': [
+      './src/app',
+    ],
+    'vendor': [
+      'regenerator-runtime/runtime',
+    ],
+  },
   output: {
-    filename: './public/js/app.js'
+    filename: `./public/js/[name].[hash:${ hashLength }].js`,
   },
   module: {
     rules: [
@@ -14,8 +39,14 @@ const conf = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['babel-preset-env'],
-            //plugins: [require('@babel/plugin-proposal-object-rest-spread')]
+            cacheDirectory: true,
+            presets: [
+              ['babel-preset-env', {
+                targets: {
+                  browsers: ['chrome >= 39']
+                }
+              }]
+            ],
           }
         }
       },
@@ -24,33 +55,28 @@ const conf = {
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: ['css-loader', 'stylus-loader']
-        })
-        // use: ExtractTextPlugin.extract(
-        //   Object.assign({
-        //     fallback: require.resolve('style-loader'),
-        //     use: [
-        //       {
-        //         loader: require.resolve('css-loader'),
-        //         options: {
-        //           importLoaders: 1,
-        //           minimize: true,
-        //           //sourceMap: shouldUseSourceMap,
-        //         },
-        //       },
-        //       {
-        //         loader: require.resolve('stylus-loader'),
-        //         options: {},
-        //       },
-        //     ],
-        //   },
-        //     extractTextPluginOptions
-        //   )
-        // )
+        }),
       }
     ]
   },
   plugins: [
-    new ExtractTextPlugin('./public/css/app.css'),
+    new TidyPlugin({
+      cleanPaths: './public/js/* ./public/css/*',
+      hashLength,
+      watching: flags.dev,
+    }),
+    new ExtractTextPlugin(`./public/css/[name].[hash:${ hashLength }].css`),
+    new WebpackAssetsManifest({
+      customize: (key, val) => {
+        return {
+          key,
+          value: val.replace('public/', ''),
+        };
+      },
+      output: './public/manifest.json',
+      publicPath: '/',
+      writeToDisk: true,
+    }),
 
     // new webpack.optimize.ModuleConcatenationPlugin(),
     // new UglifyJsPlugin({
@@ -75,7 +101,11 @@ const conf = {
     //     negate_iife: false
     //   },
     // }),
-  ]
+  ],
+  stats: {
+    modules: false,
+  },
+  watch: flags.dev,
 };
 
 module.exports = conf;
