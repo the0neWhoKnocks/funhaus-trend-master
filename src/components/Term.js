@@ -1,8 +1,7 @@
 import panelNav from './PanelNav';
 import './Term.styl';
 
-export default ({state, teams, term}) => {
-  let highPoints = 0;
+export default ({ state, teams, term }) => {
   let topTeam, btmTeam;
 
   const t1Points = ( teams[0].points.length )
@@ -20,16 +19,16 @@ export default ({state, teams, term}) => {
     btmTeam = teams[0];
   }
 
-  const teamPoints = team => {
+  const teamPoints = team => { // eslint-disable-line require-jsdoc
     if( !team.points.length ) return '';
-    return `<div class="term-panel__team-points">${team.points.reduce((total, curr) => total + curr)}</div>`;
+    return `<div class="term-panel__team-points">${ team.points.reduce((total, curr) => total + curr) }</div>`;
   };
 
-  const teamInfo = team => {
+  const teamInfo = team => { // eslint-disable-line require-jsdoc
     if( !team.name ) return '';
     return `
       <div class="term-panel__team-info">
-        <div class="term-panel__team-name">${team.name}</div>
+        <div class="term-panel__team-name">${ team.name }</div>
         ${ teamPoints(team) }
       </div>
     `;

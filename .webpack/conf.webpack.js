@@ -1,6 +1,5 @@
 const { resolve } = require('path');
 const yargs = require('yargs');
-const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const TidyPlugin = require('@noxx/webpack-tidy-plugin');
@@ -8,12 +7,12 @@ const TidyPlugin = require('@noxx/webpack-tidy-plugin');
 // =============================================================================
 
 yargs
-.option('d', {
-  alias: 'dev',
-  desc: 'Runs in Dev mode',
-  type: 'boolean',
-})
-.argv;
+  .option('d', {
+    alias: 'dev',
+    desc: 'Runs in Dev mode',
+    type: 'boolean',
+  })
+  .argv;
 
 const flags = yargs.parse();
 
@@ -45,21 +44,21 @@ const conf = {
             presets: [
               ['babel-preset-env', {
                 targets: {
-                  browsers: ['chrome >= 39']
-                }
-              }]
+                  browsers: ['chrome >= 39'],
+                },
+              }],
             ],
-          }
-        }
+          },
+        },
       },
       {
         test: /\.styl$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'stylus-loader']
+          use: ['css-loader', 'stylus-loader'],
         }),
-      }
-    ]
+      },
+    ],
   },
   plugins: [
     new TidyPlugin({

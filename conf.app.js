@@ -6,7 +6,7 @@ module.exports = {
   },
   PORT: 8081,
   paths: {
-    PUBLIC: path.resolve(`${__dirname}/public`),
-    ROOT: path.resolve(`${__dirname}/`),
-  }
+    PUBLIC: path.resolve(`${ __dirname }/public`),
+    ROOT: path.resolve(`${ __dirname }/`),
+  },
 };

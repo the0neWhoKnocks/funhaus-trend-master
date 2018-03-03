@@ -1,4 +1,4 @@
-export default ({state}) => {
+export default ({ state }) => {
   const team1 = state.teams['1'];
   const team2 = state.teams['2'];
   let lastPoints, winners, losers;
