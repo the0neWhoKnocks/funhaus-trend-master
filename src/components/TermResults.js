@@ -1,7 +1,7 @@
 import { formatAnswer } from '../utils';
 import panelNav from './PanelNav';
 
-export default async ({state}) => {
+export default async ({ state }) => {
   const terms = Object.keys(state.teams).map(key =>
     formatAnswer(state.terms[state.termNdx], state.teams[key].answers[state.termNdx])
   ).reverse(); // reverse to keep colors
@@ -32,7 +32,7 @@ export default async ({state}) => {
   const team2 = state.teams['2'];
 
   const widgetData = await fetch(`${ window.appData.endpoints.get.WIDGET_DATA }/${ terms.join(',') }`)
-  .then(resp => resp.json());
+    .then(resp => resp.json());
 
   widgetData.data.value.reverse();
   team1.points[state.termNdx] = widgetData.data.value[0];

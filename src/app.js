@@ -76,6 +76,9 @@ const direction = {
   FORWARD: 'forward',
 };
 
+/**
+ * Handles 'prev' click for nav.
+ */
 function handlePrev(){
   if( state.nav.prev.length ){
     state.nav.direction = direction.BACK;
@@ -85,6 +88,9 @@ function handlePrev(){
   }
 }
 
+/**
+ * Handles 'next' click for nav.
+ */
 function handleNext(){
   if( state.nav.nextView ){
     state.nav.direction = direction.FORWARD;
@@ -94,12 +100,15 @@ function handleNext(){
   }
 }
 
+/**
+ * Sets up a global listener for the nav actions.
+ */
 function setupNav(){
   document.getElementById('view').addEventListener('click', (ev) => {
     if( ev.target ){
       if( ev.target.matches('#prevBtn') ) handlePrev();
       if( ev.target.matches('#nextBtn') ) handleNext();
-  	}
+    }
   });
 
   document.onkeydown = (ev) => {
@@ -112,6 +121,11 @@ function setupNav(){
   };
 }
 
+/**
+ * Based on what view is passed in, the model is set up and data is stored.
+ *
+ * @param {String} viewName - The name of the component to render for the current view.
+ */
 function render(viewName){
   let viewOpts, nextView, onPreNext;
 
@@ -137,7 +151,7 @@ function render(viewName){
       viewOpts = {
         state,
         teams: [team1, team2],
-        term: state.terms[state.termNdx]
+        term: state.terms[state.termNdx],
       };
       break;
 
@@ -172,15 +186,24 @@ function render(viewName){
     els.view.innerHTML = 'Loading...';
 
     viewResult
-    .then(markup =>
-      renderComplete(markup, viewName, nextView, onPreNext)
-    )
-    .catch(err => { throw err; });
+      .then(markup =>
+        renderComplete(markup, viewName, nextView, onPreNext)
+      )
+      .catch(err => { throw err; });
   }else{
     renderComplete(viewResult, viewName, nextView, onPreNext);
   }
 }
 
+/**
+ * Since some views are async, this dumps the results of the markup to the DOM
+ * once the markup's been built. It also focuses inputs.
+ *
+ * @param {String} markup - What to render to the DOM.
+ * @param {String} viewName - Name of the previous component.
+ * @param {Object} nextView - A ref to the next component used for the next view.
+ * @param {Function} onPreNext - What to execute before the next view renders.
+ */
 function renderComplete(markup, viewName, nextView, onPreNext){
   els.view.innerHTML = markup;
   state.nav.prevView = viewName;
@@ -193,6 +216,9 @@ function renderComplete(markup, viewName, nextView, onPreNext){
   if( focusableEl ) focusableEl.focus();
 }
 
+/**
+ * Initializes the app
+ */
 function init(){
   els.view = document.querySelector('#view');
 
@@ -205,7 +231,7 @@ function init(){
 
   render(viewTypes.ENTER_TERMS);
   // render(viewTypes.TERM);
-  //render(viewTypes.TERM_RESULTS);
+  // render(viewTypes.TERM_RESULTS);
 
   setupNav();
 }

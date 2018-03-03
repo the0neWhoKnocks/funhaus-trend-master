@@ -1,5 +1,5 @@
 import panelNav from './PanelNav';
-import './EnterTerms.styl'
+import './EnterTerms.styl';
 
 export default ({ state }) => `
   <div class="enter-terms">

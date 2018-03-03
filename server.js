@@ -15,18 +15,18 @@ const indexTemplate = require('./public/index.js');
 // =============================================================================
 
 yargs
-.option('d', {
-  alias: 'dev',
-  desc: 'Runs the server in Dev mode',
-  type: 'boolean',
-})
-.option('c', {
-  alias: 'cmd',
-  choices: ['init'],
-  desc: 'What function to run on the server (only CLI)',
-})
-.help()
-.argv;
+  .option('d', {
+    alias: 'dev',
+    desc: 'Runs the server in Dev mode',
+    type: 'boolean',
+  })
+  .option('c', {
+    alias: 'cmd',
+    choices: ['init'],
+    desc: 'What function to run on the server (only CLI)',
+  })
+  .help()
+  .argv;
 
 const flags = yargs.parse();
 
@@ -48,22 +48,28 @@ const CHROME = (() => {
   }
 })();
 const app = {
+  /**
+   * Initializes the server
+   */
   init: function(){
     this.expressInst = express();
     this.server = require('http').createServer(this.expressInst);
     // doc root is `public`
     this.expressInst.use(express.static(appConfig.paths.PUBLIC));
     // allows for reading POST data
-    this.expressInst.use(bodyParser.json());   // to support JSON-encoded bodies
+    this.expressInst.use(bodyParser.json()); // to support JSON-encoded bodies
     this.expressInst.use(bodyParser.urlencoded({ // to support URL-encoded bodies
-      extended: true
+      extended: true,
     }));
 
     // bind server routes
     this.setupRoutes();
-    this.addServerListeners();
+    this.obtainPort();
   },
 
+  /**
+   * Adds in all the routes the server accepts.
+   */
   setupRoutes: function(){
     const _self = this;
     const getWidgetData = endpoints.get.WIDGET_DATA;
@@ -89,7 +95,7 @@ const app = {
 
       res.send(indexTemplate({
         appData: {
-          endpoints: feEndpoints
+          endpoints: feEndpoints,
         },
         appURL: _self.appURL,
         body: {
@@ -105,14 +111,17 @@ const app = {
             manifest['app.css'],
           ],
           title: appConfig.app.title,
-        }
+        },
       }));
     });
 
     this.expressInst.get(getWidgetData.path, getWidgetData.handler);
   },
 
-  addServerListeners: function(){
+  /**
+   * Obtains an available port and starts the server.
+   */
+  obtainPort: function(){
     const _self = this;
 
     // Dynamically sets an open port, if the default is in use.
@@ -121,7 +130,7 @@ const app = {
       switch(status){
         case 'open' : // port isn't available, so find one that is
           portscanner.findAPortNotInUse(appConfig.PORT, appConfig.PORT+20, '127.0.0.1', (error, openPort) => {
-            console.log(`${color.yellow.bold('[PORT]')} ${appConfig.PORT} in use, using ${openPort}`);
+            console.log(`${ color.yellow.bold('[PORT]') } ${ appConfig.PORT } in use, using ${ openPort }`);
 
             appConfig.PORT = openPort;
 
@@ -135,40 +144,54 @@ const app = {
     });
   },
 
+  /**
+   * Opens the browser and points to the server's assigned address.
+   *
+   * @param {Object} data - Data about the server instance.
+   */
   openBrowser: function(data){
     // let the user know the server is up and ready
-    let  msg = `${color.green.bold.inverse(' SERVER ')} Running at ${color.blue.bold(data.url)}`;
+    let msg = `${ color.green.bold.inverse(' SERVER ') } Running at ${ color.blue.bold(data.url) }`;
 
-    if( flags.dev ) msg += `\n${color.green.bold.inverse(' WATCHING ')} For changes`;
+    if( flags.dev ) msg += `\n${ color.green.bold.inverse(' WATCHING ') } For changes`;
 
-    console.log(`${msg} \n`);
+    console.log(`${ msg } \n`);
 
     opn(data.url, {
       app: [CHROME, '--incognito'],
-      wait: false // no need to wait for app to close
+      wait: false, // no need to wait for app to close
     });
   },
 
+  /**
+   * Starts the server on the obtained port and sets up the file watcher when in
+   * dev mode.
+   */
   startServer: function(){
     const _self = this;
 
     this.server.listen(appConfig.PORT, () => {
       _self.appURL = 'http://localhost:'+ appConfig.PORT +'/';
+      const serverData = {
+        url: _self.appURL,
+      };
 
-      browserSync.init({
-        browser: CHROME,
-        files: [ // watch these files
-          `${appConfig.paths.PUBLIC}/manifest.json`
-        ],
-        logLevel: 'silent', // prevent snippet message
-        notify: false, // don't show the BS message in the browser
-        port: appConfig.PORT,
-        url: _self.appURL
-      }, _self.openBrowser.bind(_self, {
-        url: _self.appURL
-      }));
+      if( flags.dev ){
+        browserSync.init({
+          browser: CHROME,
+          files: [ // watch these files
+            `${ appConfig.paths.PUBLIC }/manifest.json`,
+          ],
+          logLevel: 'silent', // prevent snippet message
+          notify: false, // don't show the BS message in the browser
+          port: appConfig.PORT,
+          url: _self.appURL,
+        }, _self.openBrowser.bind(_self, serverData));
+      }else{
+        _self.openBrowser(serverData);
+      }
     });
-  }
+  },
 };
 
 module.exports = app;

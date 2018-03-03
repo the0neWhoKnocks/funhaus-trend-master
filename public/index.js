@@ -1,3 +1,9 @@
+/**
+ * Builds out the Browser Sync script for dev mode.
+ *
+ * @param {Boolean} dev - Whether or not in dev mode.
+ * @return {String}
+ */
 function browserSyncScript(dev){
   if( !dev ) return '';
 
@@ -8,6 +14,13 @@ function browserSyncScript(dev){
   `;
 }
 
+/**
+ * A helper to loop over array items and return a CSS link or JS script.
+ *
+ * @param {Array} arr - Array of link or script URLs
+ * @param {String} type - Type of URLS ['link', 'script']
+ * @return {String}
+ */
 function each(arr, type){
   let template;
 
@@ -21,7 +34,9 @@ function each(arr, type){
       break;
   }
 
-  return arr.map((filePath) => template.replace('{PATH}', filePath)).join("\n");
+  return arr
+    .map((filePath) => template.replace('{PATH}', filePath))
+    .join("\n"); // eslint-disable-line quotes
 }
 
 module.exports = function(model){
