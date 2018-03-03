@@ -42,3 +42,11 @@ yarn start --help
 # Lint
 yarn test
 ```
+
+You can test out specific views by adding a query param of `?view=<TYPE>`. The
+available types are:
+- `ENTER_TERMS`
+- `FINAL_SCORE`
+- `PANEL_NAV`
+- `TERM`
+- `TERM_RESULTS`

@@ -34,6 +34,8 @@ export default ({ state, teams, term }) => {
     `;
   };
 
+  // TODO - add timer for how long teams have to answer
+
   return `
     <div class="term-panel">
       <div class="term-panel__top-divide is--${ topTeam.id }">

@@ -1,5 +1,6 @@
 import {
   formatAnswer,
+  getParam,
 } from './utils';
 import EnterTerms from './components/EnterTerms';
 import FinalScore from './components/FinalScore';
@@ -47,26 +48,17 @@ const state = {
   teams: {
     '1': {
       id: 'team1',
-      answers: ['Puss _', 'Twitter _', 'Gold _', 'Porn _', 'Bitcoin _', 'Money _', 'Choke _', 'Daisy _'],
+      answers: [],
       points: [],
     },
     '2': {
       id: 'team2',
-      answers: ['Free _', 'Facebook _', 'Sex _', 'Gun _', 'Car _', 'Data _', '_ Hands', 'Email _'],
+      answers: [],
       points: [],
     },
   },
   termNdx: 0,
-  terms: [
-    'Coin',
-    'Block',
-    'Farm',
-    'Regulation',
-    'Payment',
-    'Mining',
-    'Hold',
-    'Chain',
-  ],
+  terms: [],
   viewIsLoaded: false,
 };
 const team1 = state.teams['1'];
@@ -220,19 +212,35 @@ function renderComplete(markup, viewName, nextView, onPreNext){
  * Initializes the app
  */
 function init(){
+  const viewOverride = getParam('view');
+  let view = (viewOverride)
+    ? viewTypes[viewOverride]
+    : viewTypes.ENTER_TERMS;
   els.view = document.querySelector('#view');
 
-  // team1.name = formatAnswer(state.terms[state.termNdx], team1.answers[state.termNdx]);
-  // team1.points[0] = 25;
-  // team1.points[1] = 25;
-  // team2.name = formatAnswer(state.terms[state.termNdx], team2.answers[state.termNdx]);
-  // team2.points[0] = 25;
-  // team2.points[1] = 2;
+  if( viewOverride ){
+    switch(view){
+      case viewTypes.FINAL_SCORE:
+      case viewTypes.TERM:
+        state.terms = ['Coin', 'Block', 'Farm', 'Regulation', 'Payment', 'Mining', 'Hold', 'Chain'];
 
-  render(viewTypes.ENTER_TERMS);
-  // render(viewTypes.TERM);
-  // render(viewTypes.TERM_RESULTS);
+        team1.answers = ['Puss _', 'Twitter _', 'Gold _', 'Porn _', 'Bitcoin _', 'Money _', 'Choke _', 'Daisy _'];
+        team1.name = formatAnswer(state.terms[state.termNdx], team1.answers[state.termNdx]);
+        team1.points = [25, 25, 25, 2, 2, 2, 2, 100];
 
+        team2.answers = ['Free _', 'Facebook _', 'Sex _', 'Gun _', 'Car _', 'Data _', '_ Hands', 'Email _'];
+        team2.name = formatAnswer(state.terms[state.termNdx], team2.answers[state.termNdx]);
+        team2.points = [25, 25, 25, 25, 25, 25, 25, 25];
+        break;
+    }
+  }
+
+  if( !viewTypes[viewOverride] ){
+    console.warn(`'${ viewOverride }' isn't a valid view type, using default`);
+    view = viewTypes.ENTER_TERMS;
+  }
+
+  render(view);
   setupNav();
 }
 
