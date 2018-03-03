@@ -1,0 +1,100 @@
+$namespace = '.final-score';
+{$namespace} {
+  height: 100%;
+  padding: 1em;
+  background: #333;
+
+  &__section {
+    color: #FFF;
+    text-shadow: 0 2px 0.2em #000;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 1em;
+    box-shadow: 0 0.25em 0.5em 0.1em rgba(0,0,0,0.5);
+    background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0));
+
+    &-team {
+      padding: 0.1em 0.25em;
+      border-radius: 0.25em;
+
+      &.is--team1 {
+        background: var(--col-team1);
+      }
+
+      &.is--team2 {
+        background: var(--col-team2);
+      }
+    }
+
+    + {$namespace}__section {
+      margin: 0.5em 0 1em;
+    }
+  }
+
+  &__multiplier {
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+    margin-top: 0.5em;
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  &__tally {
+    width: 100%;
+    border: solid 1px;
+    border-collapse: collapse;
+    background: #FFF;
+    position: relative;
+
+    &::before {
+      content: '';
+      color: #FFF;
+      border: solid 2px;
+      outline: solid 1px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0
+      left: 0;
+    }
+
+    th, td {
+      padding: 0.5em 1em;
+      border: solid 1px;
+    }
+
+    th {
+      color: #EEE;
+      text-align: left;
+      background: #333;
+    }
+
+    {$namespace} {
+      &__answer {
+        border-right: none;
+
+        &-points {
+          padding: 0.2em;
+          border-left: none;
+        }
+      }
+    }
+  }
+
+  &__points-highlight {
+    font-weight: bold;
+    text-align: center;
+    padding: 0.3em 1em;
+    border-radius: 0.2em;
+
+    &.is--high {
+      color: #031D16;
+      background: #68E8C6;
+    }
+
+    &.is--low {
+      color: #FFF;
+      background: #EF6194;
+    }
+  }
+}

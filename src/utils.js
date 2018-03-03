@@ -10,6 +10,20 @@ function formatAnswer(term, answer){
   return answer.replace(/[_]+/, term);
 }
 
+/**
+ * Gets a query parameter value
+ *
+ * @param {String} param - The parameter name
+ * @return {String|undefined}
+ */
+function getParam(param){
+  if( !document.location.search ) return undefined;
+
+  const params = new URLSearchParams(document.location.search.substring(1));
+  return params.get(param);
+}
+
 export {
   formatAnswer,
+  getParam,
 };
