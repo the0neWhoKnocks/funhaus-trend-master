@@ -1,8 +1,9 @@
+const { resolve } = require('path');
 const yargs = require('yargs');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
-const TidyPlugin = require('./.webpack/TidyPlugin');
+const TidyPlugin = require('@noxx/webpack-tidy-plugin');
 
 // =============================================================================
 
@@ -20,6 +21,7 @@ const flags = yargs.parse();
 
 const hashLength = 8;
 const conf = {
+  context: resolve(__dirname, '../'),
   entry: {
     'app': [
       './src/app',
@@ -103,6 +105,8 @@ const conf = {
     // }),
   ],
   stats: {
+    chunks: false,
+    colors: true,
     modules: false,
   },
   watch: flags.dev,

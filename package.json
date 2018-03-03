@@ -8,7 +8,7 @@
   },
   "engine-strict": true,
   "scripts": {
-    "build": "webpack --config ./conf.webpack",
+    "build": "node ./.webpack/runner",
     "start": "node server -c init"
   },
   "repository": {
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/the0neWhoKnocks/funhaus-trend-master#readme",
   "devDependencies": {
+    "@noxx/webpack-tidy-plugin": "^1.0.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
