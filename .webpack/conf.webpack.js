@@ -1,5 +1,6 @@
 const { resolve } = require('path');
 const yargs = require('yargs');
+const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const TidyPlugin = require('@noxx/webpack-tidy-plugin');
@@ -26,6 +27,7 @@ const conf = {
       './src/app',
     ],
     'vendor': [
+      'hyperapp',
       'regenerator-runtime/runtime',
     ],
   },
@@ -41,6 +43,12 @@ const conf = {
           loader: 'babel-loader',
           options: {
             cacheDirectory: true,
+            plugins: [
+              ['transform-react-jsx', {
+                'pragma': 'h',
+              }],
+              'transform-object-rest-spread',
+            ],
             presets: [
               ['babel-preset-env', {
                 targets: {
@@ -67,6 +75,10 @@ const conf = {
       watching: flags.dev,
     }),
     new ExtractTextPlugin(`./public/css/[name].[hash:${ hashLength }].css`),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: Infinity,
+    }),
     new WebpackAssetsManifest({
       customize: (key, val) => {
         return {

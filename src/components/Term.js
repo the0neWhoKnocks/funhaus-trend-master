@@ -1,7 +1,20 @@
-import panelNav from './PanelNav';
+import { h } from 'hyperapp';
+import { getEls } from '../utils';
+import PanelNav from './PanelNav';
 import './Term.styl';
 
-export default ({ state, teams, term }) => {
+/**
+ * The place where you enter all the terms you want search for.
+ *
+ * @param {Object} state - The app's state
+ * @param {Object} actions - Actions for modifying state
+ */
+const Term = ({
+  actions,
+  state,
+}) => {
+  const teams = Object.keys(state.teams).map(key => state.teams[key]);
+  const term = state.terms[state.termNdx];
   let topTeam, btmTeam;
 
   const t1Points = ( teams[0].points.length )
@@ -19,50 +32,93 @@ export default ({ state, teams, term }) => {
     btmTeam = teams[0];
   }
 
-  const teamPoints = team => { // eslint-disable-line require-jsdoc
-    if( !team.points.length ) return '';
-    return `<div class="term-panel__team-points">${ team.points.reduce((total, curr) => total + curr) }</div>`;
+  function preNext(){ // eslint-disable-line
+    const answerEls = getEls('.js-teamAnswer');
+    const allAnswered = answerEls.every(el => el.value.trim() !== '');
+
+    if( !allAnswered ){
+      alert("All teams haven't answered.");
+      return false;
+    }
+
+    actions.setAnswers(answerEls.map(el => el.value));
+    return true;
+  }
+
+  function determinePrevView(){ // eslint-disable-line
+    return ( state.termNdx - 1 < 0 )
+      ? state.views[state.viewTypes.ENTER_TERMS]
+      : state.views[state.viewTypes.TERM_RESULTS];
+  }
+
+  function prePrev(){ // eslint-disable-line
+    if( state.termNdx !== 0 ) actions.setTermNdx(state.termNdx-1);
+    return true;
+  }
+
+  const teamPoints = team => { // eslint-disable-line
+    if( !team.points.length ) return null;
+    return (
+      <div class="term-panel__team-points">
+        { team.points.slice(0, state.termNdx+1).reduce((total, curr) => total + curr) }
+      </div>
+    );
   };
 
-  const teamInfo = team => { // eslint-disable-line require-jsdoc
+  const teamInfo = team => { // eslint-disable-line
     if( !team.name ) return '';
-    return `
+    return (
       <div class="term-panel__team-info">
-        <div class="term-panel__team-name">${ team.name }</div>
-        ${ teamPoints(team) }
+        <div class="term-panel__team-name">{ team.name }</div>
+        { teamPoints(team) }
       </div>
-    `;
+    );
   };
 
   // TODO - add timer for how long teams have to answer
 
-  return `
-    <div class="term-panel">
-      <div class="term-panel__top-divide is--${ topTeam.id }">
-        ${ teamInfo(topTeam) }
+  return (
+    <div
+      key="term"
+      class="term-panel"
+    >
+      <div class={`term-panel__top-divide is--${ topTeam.id }`}>
+        { teamInfo(topTeam) }
       </div>
-      <div class="term-panel__btm-divide is--${ btmTeam.id }">
-        ${ teamInfo(btmTeam) }
+      <div class={`term-panel__btm-divide is--${ btmTeam.id }`}>
+        { teamInfo(btmTeam) }
       </div>
       <div class="term-panel__answers">
         <input
-          class="is--team1"
+          class="is--team1 js-teamAnswer"
           type="text"
           name="team1Answer"
           placeholder="_ TERM or TERM _"
-          autofocus
-        >
+          value={ teams[0].answers[state.termNdx] }
+          oncreate={ inputRef => inputRef.focus() }
+        />
         <input
-          class="is--team2"
+          class="is--team2 js-teamAnswer"
           type="text"
-          name="team1Answer"
+          name="team2Answer"
           placeholder="_ TERM or TERM _"
-        >
+          value={ teams[1].answers[state.termNdx] }
+        />
       </div>
       <div class="term-panel__center-divide">
-        ${ term }
-        ${ panelNav(state.panelNav) }
+        { term }
+        <PanelNav
+          actions={ actions }
+          preNextView={ preNext }
+          nextView={ state.views[state.viewTypes.TERM_RESULTS] }
+          prePrevView={ prePrev }
+          prevView={ determinePrevView }
+          state={ state }
+        />
       </div>
     </div>
-  `;
+  );
 };
+Term.isView = true;
+
+export default Term;

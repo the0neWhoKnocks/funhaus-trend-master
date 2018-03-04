@@ -51,9 +51,7 @@ module.exports = function(model){
         </script>
       </head>
       <body>
-        <div class="shell">
-          <div id="view" class="view"></div>
-        </div>
+        <div id="shell" class="shell"></div>
 
         ${ each(model.body.scripts, 'script') }
         ${ browserSyncScript(model.dev) }

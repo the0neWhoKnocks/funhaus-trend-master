@@ -1,5 +1,12 @@
 .enter-terms {
 
+  [contenteditable=true]:empty:before {
+    content: attr(placeholder);
+    font-style: italic;
+    display: block; /* For Firefox */
+    opacity: 0.25;
+  }
+
   &__header {
     height: 5em;
     background: #333;
