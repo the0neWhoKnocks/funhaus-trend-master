@@ -1,7 +1,10 @@
+import { app } from 'hyperapp';
+import actions from './actions';
 import {
   formatAnswer,
   getParam,
 } from './utils';
+import Shell from './components/Shell';
 import EnterTerms from './components/EnterTerms';
 import FinalScore from './components/FinalScore';
 import PanelNav from './components/PanelNav';
@@ -24,7 +27,6 @@ import './app.styl';
   - just display those terms as N/A in the results table.
 */
 
-const els = {};
 const viewTypes = {
   ENTER_TERMS: 'enterTerms',
   FINAL_SCORE: 'finalScore',
@@ -40,11 +42,11 @@ const views = {
   [viewTypes.TERM_RESULTS]: TermResults,
 };
 const state = {
-  // multiply points for current losers on last round
-  finalMultiplier: 5,
+  finalMultiplier: 5, // multiply points for current losers on last round
   nav: {
-    prev: [],
+    globalKeyHandler: undefined,
   },
+  pointsSaved: false,
   teams: {
     '1': {
       id: 'team1',
@@ -59,191 +61,47 @@ const state = {
   },
   termNdx: 0,
   terms: [],
-  viewIsLoaded: false,
+  view: views[viewTypes.ENTER_TERMS],
+  viewTypes,
+  views,
 };
 const team1 = state.teams['1'];
 const team2 = state.teams['2'];
-const direction = {
-  BACK: 'back',
-  FORWARD: 'forward',
-};
+const viewOverride = getParam('view');
+const onRails = getParam('onRails');
+
+state.view = (viewOverride)
+  ? views[viewOverride]
+  : views[viewTypes.ENTER_TERMS];
 
 /**
- * Handles 'prev' click for nav.
+ * Sets up all the mock data for development work
  */
-function handlePrev(){
-  if( state.nav.prev.length ){
-    state.nav.direction = direction.BACK;
-    const prev = state.nav.prev[state.nav.prev.length-1];
-    state.nav.prev.pop();
-    prev();
-  }
+function setupAllData(){
+  state.terms = ['Coin', 'Block', 'Farm', 'Regulation', 'Payment', 'Mining', 'Hold', 'Chain'];
+
+  team1.answers = ['Puss _', 'Twitter _', 'Gold _', 'Porn _', 'Bitcoin _', 'Money _', 'Choke _', 'Daisy _'];
+  team1.name = formatAnswer(state.terms[state.termNdx], team1.answers[state.termNdx]);
+  team1.points = [25, 25, 25, 2, 2, 2, 2, 100];
+
+  team2.answers = ['Free _', 'Facebook _', 'Sex _', 'Gun _', 'Car _', 'Data _', '_ Hands', 'Email _'];
+  team2.name = formatAnswer(state.terms[state.termNdx], team2.answers[state.termNdx]);
+  team2.points = [25, 25, 25, 25, 25, 25, 25, 25];
 }
 
-/**
- * Handles 'next' click for nav.
- */
-function handleNext(){
-  if( state.nav.nextView ){
-    state.nav.direction = direction.FORWARD;
-    state.nav.prev.push(render.bind(null, state.nav.prevView));
-    if( state.nav.onPreNext ) state.nav.onPreNext();
-    render(state.nav.nextView);
-  }
-}
+if( onRails !== undefined ) setupAllData();
 
-/**
- * Sets up a global listener for the nav actions.
- */
-function setupNav(){
-  document.getElementById('view').addEventListener('click', (ev) => {
-    if( ev.target ){
-      if( ev.target.matches('#prevBtn') ) handlePrev();
-      if( ev.target.matches('#nextBtn') ) handleNext();
-    }
-  });
-
-  document.onkeydown = (ev) => {
-    if( ev.ctrlKey && state.viewIsLoaded ){
-      switch( ev.keyCode ){
-        case 37: handlePrev(); break;
-        case 39: handleNext(); break;
-      }
-    }
-  };
-}
-
-/**
- * Based on what view is passed in, the model is set up and data is stored.
- *
- * @param {String} viewName - The name of the component to render for the current view.
- */
-function render(viewName){
-  let viewOpts, nextView, onPreNext;
-
-  state.viewIsLoaded = false;
-
-  switch(viewName){
-    case viewTypes.ENTER_TERMS :
-      nextView = viewTypes.TERM;
-      viewOpts = { state };
-      break;
-
-    case viewTypes.FINAL_SCORE :
-      viewOpts = { state };
-      break;
-
-    case viewTypes.TERM :
-      nextView = viewTypes.TERM_RESULTS;
-      onPreNext = () => {
-        // TODO - store answers
-        console.log('== store answers');
-        // TODO - block Next if answers haven't been entered
-      };
-      viewOpts = {
-        state,
-        teams: [team1, team2],
-        term: state.terms[state.termNdx],
-      };
-      break;
-
-    case viewTypes.TERM_RESULTS :
-      if( state.nav.direction && state.nav.direction === direction.BACK ) state.termNdx--;
-
-      if( !team1.name ){
-        team1.name = formatAnswer(
-          state.terms[state.termNdx],
-          team1.answers[state.termNdx]
-        );
-        team2.name = formatAnswer(
-          state.terms[state.termNdx],
-          team2.answers[state.termNdx]
-        );
-      }
-
-      onPreNext = () => {
-        if( state.nav.direction && state.nav.direction === direction.FORWARD ) state.termNdx++;
-      };
-
-      nextView = ( state.termNdx + 1 > state.terms.length-1 )
-        ? viewTypes.FINAL_SCORE
-        : viewTypes.TERM;
-      viewOpts = { state };
-      break;
+if( viewOverride ){
+  switch(viewOverride){
+    case viewTypes.FINAL_SCORE:
+    case viewTypes.TERM:
+    case viewTypes.TERM_RESULTS: setupAllData(); break;
   }
 
-  const viewResult = views[viewName](viewOpts);
-
-  if( Promise.resolve(viewResult) == viewResult ){
-    els.view.innerHTML = 'Loading...';
-
-    viewResult
-      .then(markup =>
-        renderComplete(markup, viewName, nextView, onPreNext)
-      )
-      .catch(err => { throw err; });
-  }else{
-    renderComplete(viewResult, viewName, nextView, onPreNext);
-  }
-}
-
-/**
- * Since some views are async, this dumps the results of the markup to the DOM
- * once the markup's been built. It also focuses inputs.
- *
- * @param {String} markup - What to render to the DOM.
- * @param {String} viewName - Name of the previous component.
- * @param {Object} nextView - A ref to the next component used for the next view.
- * @param {Function} onPreNext - What to execute before the next view renders.
- */
-function renderComplete(markup, viewName, nextView, onPreNext){
-  els.view.innerHTML = markup;
-  state.nav.prevView = viewName;
-  state.nav.nextView = nextView;
-  state.nav.onPreNext = onPreNext;
-  state.viewIsLoaded = true;
-
-  // autofocus only works on load, this will work for any view that's loaded
-  const focusableEl = document.querySelector('[autofocus]');
-  if( focusableEl ) focusableEl.focus();
-}
-
-/**
- * Initializes the app
- */
-function init(){
-  const viewOverride = getParam('view');
-  let view = (viewOverride)
-    ? viewTypes[viewOverride]
-    : viewTypes.ENTER_TERMS;
-  els.view = document.querySelector('#view');
-
-  if( viewOverride ){
-    switch(view){
-      case viewTypes.FINAL_SCORE:
-      case viewTypes.TERM:
-        state.terms = ['Coin', 'Block', 'Farm', 'Regulation', 'Payment', 'Mining', 'Hold', 'Chain'];
-
-        team1.answers = ['Puss _', 'Twitter _', 'Gold _', 'Porn _', 'Bitcoin _', 'Money _', 'Choke _', 'Daisy _'];
-        team1.name = formatAnswer(state.terms[state.termNdx], team1.answers[state.termNdx]);
-        team1.points = [25, 25, 25, 2, 2, 2, 2, 100];
-
-        team2.answers = ['Free _', 'Facebook _', 'Sex _', 'Gun _', 'Car _', 'Data _', '_ Hands', 'Email _'];
-        team2.name = formatAnswer(state.terms[state.termNdx], team2.answers[state.termNdx]);
-        team2.points = [25, 25, 25, 25, 25, 25, 25, 25];
-        break;
-    }
-  }
-
-  if( !viewTypes[viewOverride] ){
+  if( !state.view ){
     console.warn(`'${ viewOverride }' isn't a valid view type, using default`);
-    view = viewTypes.ENTER_TERMS;
+    state.view = views[viewTypes.ENTER_TERMS];
   }
-
-  render(view);
-  setupNav();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  init();
-}, false);
+app(state, actions, Shell, document.querySelector('#shell'));

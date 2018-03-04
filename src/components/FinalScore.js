@@ -1,7 +1,18 @@
+import { h } from 'hyperapp';
 import { formatAnswer } from '../utils';
+import PanelNav from './PanelNav';
 import './FinalScore.styl';
 
-export default ({ state }) => {
+/**
+ * The place where you enter all the terms you want search for.
+ *
+ * @param {Object} state - The app's state
+ * @param {Object} actions - Actions for modifying state
+ */
+const FinalScore = ({
+  actions,
+  state,
+}) => {
   const teams = Object.keys(state.teams).map((key) => state.teams[key]);
   const team1 = teams[0];
   const team2 = teams[1];
@@ -38,18 +49,18 @@ export default ({ state }) => {
    */
   const headers = () => {
     const teamHeaders = teams.map((team) => {
-      return `
-        <th class="final-score__answer">${ team.name }</th>
-        <th class="final-score__answer-points"></th>
-      `;
+      return ([
+        <th class="final-score__answer">{ team.name }</th>,
+        <th class="final-score__answer-points" />,
+      ]);
     });
 
-    return `
+    return (
       <tr>
         <th>Term</th>
-        ${ teamHeaders.join('') }
+        { teamHeaders }
       </tr>
-    `;
+    );
   };
 
   /**
@@ -60,7 +71,6 @@ export default ({ state }) => {
 
     state.terms.forEach((term, ndx) => {
       let highest = 0;
-      const termTd = `<td>${ term }</td>`;
       const teamAnswers = [];
       const points = teams.map((team) => {
         const curr = team.points[ndx];
@@ -71,18 +81,23 @@ export default ({ state }) => {
       teams.forEach((team, teamNdx) => {
         const pointClass = ( points[teamNdx] === highest ) ? 'is--high' : 'is--low';
 
-        teamAnswers.push(`
-          <td class="final-score__answer">${ formatAnswer(term, team.answers[ndx]) }</td>
+        teamAnswers.push([
+          <td class="final-score__answer">{ formatAnswer(term, team.answers[ndx]) }</td>,
           <td class="final-score__answer-points">
-            <div class="final-score__points-highlight ${ pointClass }">${ points[teamNdx] }</div>
-          </td>
-        `);
+            <div class={`final-score__points-highlight ${ pointClass }`}>{ points[teamNdx] }</div>
+          </td>,
+        ]);
       });
 
-      rows.push(`<tr>${ termTd }${ teamAnswers.join('') }</tr>`);
+      rows.push(
+        <tr>
+          <td>{ term }</td>
+          { teamAnswers }
+        </tr>
+      );
     });
 
-    return rows.join('');
+    return rows;
   };
 
   /**
@@ -93,27 +108,35 @@ export default ({ state }) => {
    */
   const multiplier = (hasMultiplier) => {
     if( !hasMultiplier ) return '';
-    return `
+    return (
       <div class="final-score__multiplier">
-        Multiplier Added: ${ hasMultiplier } points
+        Multiplier Added: { hasMultiplier } points
       </div>
-    `;
+    );
   };
 
-  return `
+  return (
     <div class="final-score">
       <div class="final-score__section">
-        Winners: <span class="final-score__section-team ${ winnersClass }">${ winners.name }</span> with ${ winners.finalScore } points
-        ${ multiplier(winners.multiplier) }
+        Winners: <span class={`final-score__section-team ${ winnersClass }`}>{ winners.name }</span> with { winners.finalScore } points
+        { multiplier(winners.multiplier) }
       </div>
       <div class="final-score__section">
-        Losers: <span class="final-score__section-team ${ losersClass }">${ losers.name }</span> with ${ losers.finalScore } points
-        ${ multiplier(losers.multiplier) }
+        Losers: <span class={`final-score__section-team ${ losersClass }`}>{ losers.name }</span> with { losers.finalScore } points
+        { multiplier(losers.multiplier) }
       </div>
       <table class="final-score__tally">
-        ${ headers() }
-        ${ answerRows() }
+        { headers() }
+        { answerRows() }
       </table>
+      <PanelNav
+        actions={ actions }
+        prevView={ state.views[state.viewTypes.TERM_RESULTS] }
+        state={ state }
+      />
     </div>
-  `;
+  );
 };
+FinalScore.isView = true;
+
+export default FinalScore;

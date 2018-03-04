@@ -43,10 +43,12 @@ yarn start --help
 yarn test
 ```
 
-You can test out specific views by adding a query param of `?view=<TYPE>`. The
-available types are:
-- `ENTER_TERMS`
-- `FINAL_SCORE`
-- `PANEL_NAV`
-- `TERM`
-- `TERM_RESULTS`
+You can go through the app without having to set up any data by adding this to
+the URL `?onRails`.
+
+You can also test out specific views by adding a query param of `?view=<TYPE>`.
+The available types are:
+- `enterTerms`
+- `finalScore`
+- `term`
+- `termResults`

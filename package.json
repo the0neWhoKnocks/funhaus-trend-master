@@ -27,6 +27,8 @@
     "@noxx/webpack-tidy-plugin": "^1.0.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "browser-sync": "^2.18.7",
     "css-loader": "^0.28.9",
@@ -43,6 +45,7 @@
     "cli-color": "^1.1.0",
     "express": "^4.14.1",
     "google-trends-api": "^4.5.0",
+    "hyperapp": "^1.1.2",
     "portscanner": "^2.1.1",
     "regenerator": "^0.12.3",
     "yargs": "^11.0.0"

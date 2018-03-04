@@ -11,6 +11,19 @@ function formatAnswer(term, answer){
 }
 
 /**
+ * Returns an iterable Array of DOM elements.
+ *
+ * @param {String} query - What CSS class or id to find.
+ * @param {Object} ctx - What element to look for elements in.
+ * @return {Array}
+ */
+function getEls(query, ctx){
+  return Array.prototype.slice.call(
+    (ctx || document).querySelectorAll(query)
+  );
+}
+
+/**
  * Gets a query parameter value
  *
  * @param {String} param - The parameter name
@@ -25,5 +38,6 @@ function getParam(param){
 
 export {
   formatAnswer,
+  getEls,
   getParam,
 };
