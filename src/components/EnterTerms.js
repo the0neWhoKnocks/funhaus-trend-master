@@ -22,6 +22,21 @@ const EnterTerms = ({ state, actions }) => {
     return true;
   }
 
+  function handleColorChange(ev){ // eslint-disable-line
+    const input = ev.currentTarget;
+
+    actions.config.setColor({
+      ndx: input.dataset.ndx,
+      color: input.value,
+    });
+  }
+
+  function handleMultiplierChange(ev){ // eslint-disable-line
+    const input = ev.currentTarget;
+
+    actions.config.setPointMultiplier(input.value);
+  }
+
   return (
     <div
       key="enterTerms"
@@ -31,26 +46,60 @@ const EnterTerms = ({ state, actions }) => {
         <img class="enter-terms__header-img" src="/imgs/logo-funhaus.svg" />
         <div class="enter-terms__header-title">Trend Master</div>
       </header>
-      <section class="enter-terms__body">
-        <label class="enter-terms__label">
-          Enter the base terms each search will be based on.<br />
-          <strong>Be sure to separate each term by a comma.</strong>
-        </label>
-        <div
-          contenteditable="true"
-          id="baseTerms"
-          class="enter-terms__input"
-          tabindex="0"
-          placeholder="term1, term2"
-          oncreate={ inputRef => inputRef.focus() }
-        >{ state.terms.join(', ') }</div>
+      <div class="is--va">
+        <section class="enter-terms__body">
+          <label class="enter-terms__label">
+            Enter the base terms each search will be based on.<br />
+            <strong>Be sure to separate each term by a comma.</strong>
+          </label>
+          <div
+            contenteditable="true"
+            id="baseTerms"
+            class="enter-terms__input"
+            tabindex="0"
+            placeholder="term1, term2"
+            oncreate={ inputRef => inputRef.focus() }
+          >{ state.terms.join(', ') }</div>
+          <br />
+          <label>
+            Team 1 Color:&nbsp;
+            <input
+              type="color"
+              value={ state.config.colors[0] }
+              data-ndx="0"
+              onchange={ handleColorChange }
+            />
+          </label>
+          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+          <label>
+            Team 2 Color:&nbsp;
+            <input
+              type="color"
+              value={ state.config.colors[1] }
+              data-ndx="1"
+              onchange={ handleColorChange }
+            />
+          </label>
+          &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+          <label>
+            Multiplier:&nbsp;
+            <input
+              type="number"
+              value={ state.config.pointMultiplier }
+              step="1"
+              min="0"
+              max="10"
+              onchange={ handleMultiplierChange }
+            />
+          </label>
+        </section>
         <PanelNav
           actions={ actions }
           nextView={ state.views[state.viewTypes.TERM] }
           preNextView={ preNext }
           state={ state }
         />
-      </section>
+      </div>
     </div>
   );
 };

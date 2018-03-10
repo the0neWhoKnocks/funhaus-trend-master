@@ -49,6 +49,7 @@
     "portscanner": "^2.1.1",
     "regenerator": "^0.12.3",
     "svg.js": "^2.6.4",
+    "tinycolor2": "^1.4.1",
     "yargs": "^11.0.0"
   }
 }

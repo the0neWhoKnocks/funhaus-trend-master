@@ -1,6 +1,31 @@
+import tinycolor from 'tinycolor2';
 import { secsToTime } from './utils';
 
 const actions = {
+  config: {
+    setColor: ({ ndx, color }) => state => {
+      const colors = [...state.colors];
+      ndx = +ndx;
+      colors[ndx] = color;
+
+      document.documentElement.style.setProperty(
+        `--col-team${ ndx+1 }`,
+        color
+      );
+      document.documentElement.style.setProperty(
+        `--col-team${ ndx+1 }-dark`,
+        tinycolor(color).darken(20).toString()
+      );
+
+      return {
+        colors,
+      };
+    },
+
+    setPointMultiplier: val => () => ({
+      pointMultiplier: +val,
+    }),
+  },
 
   nav: {
     setGlobalKeyHandler: val => () => ({
@@ -61,6 +86,8 @@ const actions = {
 
     for(let key in state.teams){
       const team = state.teams[key];
+      team.answers = team.answers.slice(0, terms.length);
+      team.points = team.points.slice(0, terms.length);
 
       // remove items in answers that don't contain current terms
       for(let i=team.answers.length-1; i>0; i--){

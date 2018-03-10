@@ -4,6 +4,10 @@ A game-ified version of Funhaus' web series.
 
 ![funhaus-trend-master-01](https://user-images.githubusercontent.com/344140/37237718-49e0e91c-23cc-11e8-82a8-d502cacfde2b.gif)
 
+Customizable
+
+![funhaus-trend-master__customizable-01](https://user-images.githubusercontent.com/344140/37246652-55ddc492-2462-11e8-8a27-eacadafe35fa.gif)
+
 ---
 
 ## Installation
