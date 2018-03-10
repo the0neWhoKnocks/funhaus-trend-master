@@ -189,4 +189,48 @@ $termPanel = '.term-panel';
       float: right;
     }
   }
+
+  .timer {
+    padding: 0.25em;
+    border-top: solid 1px #fff;
+    background: #dedede;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    &::before,
+    &::after {
+      content: '';
+      display: inline-block;
+      border: solid 1.5em #dedede;
+      border-top-color: transparent;
+      position: absolute;
+      top: -1px;
+    }
+    &::before {
+      border-left-color: transparent;
+      right: 99%;
+    }
+    &::after {
+      border-right-color: transparent;
+      left: 99%;
+    }
+
+    &__display {
+      display: inline-block;
+    }
+
+    &__btn {
+      width: 4.3em;
+      height: 1.8em;
+      color: #eee;
+      font-weight: bold;
+      padding: 0 0.75em 0 0.7em;
+      border: none;
+      border-left: solid 2px #dedede;
+      background: #333;
+      vertical-align: top;
+    }
+  }
 }

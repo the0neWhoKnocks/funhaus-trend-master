@@ -29,6 +29,7 @@ const conf = {
     'vendor': [
       'hyperapp',
       'regenerator-runtime/runtime',
+      'svg.js',
     ],
   },
   output: {

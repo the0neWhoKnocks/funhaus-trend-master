@@ -2,6 +2,8 @@
 
 A game-ified version of Funhaus' web series.
 
+![funhaus-trend-master-01](https://user-images.githubusercontent.com/344140/37237718-49e0e91c-23cc-11e8-82a8-d502cacfde2b.gif)
+
 ---
 
 ## Installation
@@ -44,7 +46,7 @@ yarn test
 ```
 
 You can go through the app without having to set up any data by adding this to
-the URL `?onRails`.
+the URL `?demo`.
 
 You can also test out specific views by adding a query param of `?view=<TYPE>`.
 The available types are:

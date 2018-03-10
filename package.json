@@ -48,6 +48,7 @@
     "hyperapp": "^1.1.2",
     "portscanner": "^2.1.1",
     "regenerator": "^0.12.3",
+    "svg.js": "^2.6.4",
     "yargs": "^11.0.0"
   }
 }
