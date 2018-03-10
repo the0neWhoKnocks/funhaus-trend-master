@@ -24,11 +24,11 @@ const FinalScore = ({
   // Add multiplier to lowest score
   if( team1.finalScore < team2.finalScore ){
     lastPoints = team1.points[team1.points.length - 1];
-    team1.multiplier = (lastPoints * state.finalMultiplier) - lastPoints;
+    team1.multiplier = (lastPoints * state.config.pointMultiplier) - lastPoints;
     team1.finalScore += team1.multiplier;
   }else{
     lastPoints = team2.points[team2.points.length - 1];
-    team2.multiplier = (lastPoints * state.finalMultiplier) - lastPoints;
+    team2.multiplier = (lastPoints * state.config.pointMultiplier) - lastPoints;
     team2.finalScore += team2.multiplier;
   }
 

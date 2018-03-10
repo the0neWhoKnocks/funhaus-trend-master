@@ -43,7 +43,13 @@ const views = {
   [viewTypes.TERM_RESULTS]: TermResults,
 };
 const state = {
-  finalMultiplier: 5, // multiply points for current losers on last round
+  config: {
+    colors: [
+      '#f44336',
+      '#4285f4',
+    ],
+    pointMultiplier: 5, // multiply points for current losers on last round
+  },
   nav: {
     globalKeyHandler: undefined,
   },
