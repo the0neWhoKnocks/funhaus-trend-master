@@ -38,8 +38,8 @@ yarn build -d # terminal 1
 yarn start -d # terminal 2
 
 # view help
+yarn build --help
 yarn start --help
-# build command doesn't have a help since WebPack will override it
 
 # Lint
 yarn test
