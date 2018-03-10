@@ -1,6 +1,7 @@
 import { h } from 'hyperapp';
 import { getEls } from '../utils';
 import PanelNav from './PanelNav';
+import Timer from './Timer';
 import './Term.styl';
 
 /**
@@ -14,22 +15,24 @@ const Term = ({
   state,
 }) => {
   const teams = Object.keys(state.teams).map(key => state.teams[key]);
+  const team1 = teams[0];
+  const team2 = teams[1];
   const term = state.terms[state.termNdx];
   let topTeam, btmTeam;
 
-  const t1Points = ( teams[0].points.length )
-    ? teams[0].points.reduce((total, curr) => total + curr)
+  const t1Points = ( team1.points.length )
+    ? team1.points.reduce((total, curr) => (curr) ? total + curr : total)
     : 0;
-  const t2Points = ( teams[1].points.length )
-    ? teams[1].points.reduce((total, curr) => total + curr)
+  const t2Points = ( team2.points.length )
+    ? team2.points.reduce((total, curr) => (curr) ? total + curr : total)
     : 0;
 
   if( t1Points >= t2Points ){
-    topTeam = teams[0];
-    btmTeam = teams[1];
+    topTeam = team1;
+    btmTeam = team2;
   }else{
-    topTeam = teams[1];
-    btmTeam = teams[0];
+    topTeam = team2;
+    btmTeam = team1;
   }
 
   function preNext(){ // eslint-disable-line
@@ -42,6 +45,8 @@ const Term = ({
     }
 
     actions.setAnswers(answerEls.map(el => el.value));
+    if( actions.timer.getRunning() ) actions.timer.stop(actions);
+
     return true;
   }
 
@@ -53,6 +58,8 @@ const Term = ({
 
   function prePrev(){ // eslint-disable-line
     if( state.termNdx !== 0 ) actions.setTermNdx(state.termNdx-1);
+    if( actions.timer.getRunning() ) actions.timer.stop(actions);
+
     return true;
   }
 
@@ -60,7 +67,7 @@ const Term = ({
     if( !team.points.length ) return null;
     return (
       <div class="term-panel__team-points">
-        { team.points.slice(0, state.termNdx+1).reduce((total, curr) => total + curr) }
+        { team.points.slice(0, state.termNdx+1).reduce((total, curr) => (curr) ? total + curr : total) }
       </div>
     );
   };
@@ -74,8 +81,6 @@ const Term = ({
       </div>
     );
   };
-
-  // TODO - add timer for how long teams have to answer
 
   return (
     <div
@@ -107,6 +112,11 @@ const Term = ({
       </div>
       <div class="term-panel__center-divide">
         { term }
+        <Timer
+          actions={ actions }
+          duration={ state.timer.duration }
+          state={ state }
+        />
         <PanelNav
           actions={ actions }
           preNextView={ preNext }

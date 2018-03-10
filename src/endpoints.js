@@ -15,11 +15,21 @@ module.exports = {
         })
           .then((results) => {
             results = JSON.parse(results);
+            const resultsArr = [];
+
+            // separate all the coords into their own tracks
+            for(let i=0; i<results.default.timelineData.length; i++){
+              const currCoord = results.default.timelineData[i].value;
+
+              for(let j=0; j<currCoord.length; j++){
+                if( !resultsArr[j] ) resultsArr[j] = [];
+                resultsArr[j].push(currCoord[j]);
+              }
+            }
 
             const msg = `Got data for - terms: ${ req.params.terms }`;
-            const latest = results.default.timelineData.pop();
             const respData = {
-              data: latest,
+              data: resultsArr,
               msg: msg,
               status: 200,
             };

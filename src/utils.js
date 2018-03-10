@@ -36,8 +36,29 @@ function getParam(param){
   return params.get(param);
 }
 
+/**
+ * Parses seconds into a time for a clock
+ *
+ * @param {Number} s - number of seconds
+ * @return {String}
+ */
+function secsToTime(s){
+  let mins = s / 60;
+  let secs = ( mins >= 1 ) ? mins*60 - secs : s;
+
+  mins = ( mins < 1 )
+    ? '00'
+    : ( mins >= 10 ) ? mins : `0${ mins }`;
+  secs = ( secs < 1 )
+    ? '00'
+    : ( secs >= 10 ) ? secs : `0${ secs }`;
+
+  return `${ mins }:${ secs }`;
+}
+
 export {
   formatAnswer,
   getEls,
   getParam,
+  secsToTime,
 };

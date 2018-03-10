@@ -102,7 +102,6 @@ const app = {
           scripts: [
             manifest['vendor.js'],
             manifest['app.js'],
-            'https://ssl.gstatic.com/trends_nrtr/1308_RC02/embed_loader.js',
           ],
         },
         dev: flags.dev,

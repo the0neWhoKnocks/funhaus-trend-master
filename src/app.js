@@ -3,6 +3,7 @@ import actions from './actions';
 import {
   formatAnswer,
   getParam,
+  secsToTime,
 } from './utils';
 import Shell from './components/Shell';
 import EnterTerms from './components/EnterTerms';
@@ -46,7 +47,10 @@ const state = {
   nav: {
     globalKeyHandler: undefined,
   },
-  pointsSaved: false,
+  results: {
+    graphData: undefined,
+    pointsSaved: false,
+  },
   teams: {
     '1': {
       id: 'team1',
@@ -61,6 +65,12 @@ const state = {
   },
   termNdx: 0,
   terms: [],
+  timer: {
+    duration: 30,
+    running: false,
+    time: secsToTime(30),
+    timeout: undefined,
+  },
   view: views[viewTypes.ENTER_TERMS],
   viewTypes,
   views,
@@ -68,7 +78,7 @@ const state = {
 const team1 = state.teams['1'];
 const team2 = state.teams['2'];
 const viewOverride = getParam('view');
-const onRails = getParam('onRails');
+const isDemo = getParam('demo');
 
 state.view = (viewOverride)
   ? views[viewOverride]
@@ -82,20 +92,25 @@ function setupAllData(){
 
   team1.answers = ['Puss _', 'Twitter _', 'Gold _', 'Porn _', 'Bitcoin _', 'Money _', 'Choke _', 'Daisy _'];
   team1.name = formatAnswer(state.terms[state.termNdx], team1.answers[state.termNdx]);
-  team1.points = [25, 25, 25, 2, 2, 2, 2, 100];
 
   team2.answers = ['Free _', 'Facebook _', 'Sex _', 'Gun _', 'Car _', 'Data _', '_ Hands', 'Email _'];
   team2.name = formatAnswer(state.terms[state.termNdx], team2.answers[state.termNdx]);
-  team2.points = [25, 25, 25, 25, 25, 25, 25, 25];
 }
 
-if( onRails !== undefined ) setupAllData();
+if( isDemo !== undefined ) setupAllData();
 
 if( viewOverride ){
   switch(viewOverride){
-    case viewTypes.FINAL_SCORE:
     case viewTypes.TERM:
-    case viewTypes.TERM_RESULTS: setupAllData(); break;
+    case viewTypes.TERM_RESULTS:
+      setupAllData();
+      break;
+
+    case viewTypes.FINAL_SCORE:
+      setupAllData();
+      team1.points = [25, 25, 25, 2, 2, 2, 2, 100];
+      team2.points = [25, 25, 25, 25, 25, 25, 25, 25];
+      break;
   }
 
   if( !state.view ){
