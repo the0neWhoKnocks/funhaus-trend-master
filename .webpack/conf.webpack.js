@@ -33,7 +33,7 @@ const conf = {
     ],
   },
   output: {
-    filename: `./public/js/[name].[hash:${ hashLength }].js`,
+    filename: `./public/js/[name].[chunkhash:${ hashLength }].js`,
   },
   module: {
     rules: [
@@ -71,11 +71,10 @@ const conf = {
   },
   plugins: [
     new TidyPlugin({
-      cleanPaths: './public/js/* ./public/css/*',
+      cleanOutput: true,
       hashLength,
-      watching: flags.dev,
     }),
-    new ExtractTextPlugin(`./public/css/[name].[hash:${ hashLength }].css`),
+    new ExtractTextPlugin(`./public/css/[name].[chunkhash:${ hashLength }].css`),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: Infinity,
@@ -116,6 +115,10 @@ const conf = {
     //   },
     // }),
   ],
+  resolve: {
+    // ensure any symlinked paths resolve to current repo
+    symlinks: false,
+  },
   stats: {
     chunks: false,
     colors: true,
