@@ -24,7 +24,7 @@
   "homepage": "https://github.com/the0neWhoKnocks/funhaus-trend-master#readme",
   "devDependencies": {
     "@noxx/eslint-config": "^1.0.3",
-    "@noxx/webpack-tidy-plugin": "^1.0.2",
+    "@noxx/webpack-tidy-plugin": "2.0.1",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
